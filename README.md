@@ -126,6 +126,41 @@ El resultado es un **GeoJSON final completo**, con todas las direcciones incorpo
 
 ---
 
+### 5️⃣ Limpiar Direcciones GeoJSON
+
+Una vez todas las partes han sido procesadas:
+
+```python
+# limpiar_direcciones.py
+python limpiar_direcciones.py
+```
+
+El resultado es un **GeoJSON final completo**, con todas las direcciones limpias.
+
+**Ejemplos:**
+
+```python
+"81, Calle José María Giles Ontiveros, Pardaleras, Badajoz..."
+"Calle José María Giles Ontiveros 81"
+
+"Calle Dolores Marabe, Urbanización Guadiana, Badajoz..."
+"Calle Dolores Marabe"
+
+"Carretera de Talavera la Real a La Albuera, Alvarado..."
+"Carretera de Talavera la Real a La Albuera"
+
+"Calle San Marcial, El Gurugú, Badajoz..."
+"Calle San Marcial"
+```
+
+### 6️⃣ Minimizar el GeoJSON
+
+Una vez todas las partes han sido procesadas, minimizamos el josn para producción con JQ:
+
+```python
+jq.exe -c . potencial-solar-badajoz_completo_opt.geojson > potencial-solar-badajoz_completo_opt_min.json
+```
+
 ## 🗺️ Compatibilidad
 
 - Python 3.x (probado)

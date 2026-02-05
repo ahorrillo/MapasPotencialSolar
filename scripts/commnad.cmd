@@ -7,5 +7,5 @@ unir_geojson("geojson_divididos/", "datos_completos.geojson")
 # Para Obtener la dirección:
 python potencial-solar-badajoz-best.py parte_001.geojson
 
-#Minimizar el Json
+# Minimizar el Json
 jq.exe -c . potencial-solar-badajoz_completo.geojson > potencial-solar-badajoz_completo_min.json
