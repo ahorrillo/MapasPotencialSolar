@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mapa Potencial Solar Cáceres</title>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+
+<style>
+.leaflet-tile {
+    filter: grayscale(1) contrast(0.5) brightness(1.3);
+}
+
+.voc-map-contenedor {
+    width: 100%;
+    height: 600px;
+    position: relative;
+}
+
+#voc-map {
+    height: 600px;
+    width: 100%;
+}
+
+@media (max-width: 699px) {
+    #voc-map { height: 500px; }
+}
+
+.leaflet-tooltip {
+    min-width: 80px;
+    font-size: 14px;
+    white-space: normal;
+}
+
+.leaflet-tooltip .highlighted {
+    font-weight: bold;
+}
+
+/* Buscador */
+#voc-map-search-box {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    z-index: 1000;
+    background: white;
+    border-radius: 4px;
+    border: 1px solid #969594;
+    padding: 6px 10px;
+}
+
+#voc-map-search-input {
+    border: none;
+    font-size: 14px;
+    outline: none;
+    width: 200px;
+}
+</style>
+</head>
+
+<body>
+<div class="voc-map-contenedor">
+
+<div id="voc-map-search-box">
+    <input id="voc-map-search-input" type="text" placeholder="Buscar dirección...">
+</div>
+
+<div id="voc-map"></div>
+</div>
+
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<script>
+const map = L.map('voc-map', {
+    center: [39.47649, -6.37224], // Cáceres
+    zoom: 15,
+    preferCanvas: true
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 19
+}).addTo(map);
+
+// Escala de colores y rangos exactos
+const colores = ['#f7f7f7','#ffffb3','#fdc086','#fc8d59','#e34a33','#b30000','#7f0000'];
+const rangosColores = [
+  { min: 320, max: 569, color: colores[0] },
+  { min: 570, max: 817, color: colores[1] },
+  { min: 818, max: 1066, color: colores[2] },
+  { min: 1067, max: 1314, color: colores[3] },
+  { min: 1315, max: 1563, color: colores[4] },
+  { min: 1564, max: 1812, color: colores[5] },
+  { min: 1813, max: 2060, color: colores[6] }
+];
+
+let selectedLayers = [];
+let vocMapIndex = {};
+
+// Normalizar cadenas (quita acentos y minúsculas)
+function normalizeString(str) {
+    return str ? str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase() : "";
+}
+
+// Función para obtener color según rango exacto
+function getColorByRange(valor) {
+  const v = Number(valor);
+  if (isNaN(v)) return '#ccc'; // color por defecto si no hay valor
+  for (const rango of rangosColores) {
+    if (v >= rango.min && v <= rango.max) return rango.color;
+  }
+  return '#ccc'; // fallback
+}
+
+// Estilo de cada polígono
+function style(feature) {
+  const potencial = feature.properties.potencial_solar;
+  return {
+    fillColor: getColorByRange(potencial),
+    weight: 0.4,
+    color: 'white',
+    opacity: 1,
+    fillOpacity: 0.8
+  };
+}
+
+// Limpiar selección
+function clearHighlight() {
+    selectedLayers.forEach(l => l.setStyle(style(l.feature)));
+    selectedLayers = [];
+}
+
+// Resaltar capas
+function highlightLayers(layers) {
+    clearHighlight();
+    layers.forEach(layer => {
+        layer.setStyle({
+            weight: 3,
+            color: '#000',
+            fillOpacity: 1
+        });
+    });
+    selectedLayers = layers;
+}
+
+// Cargar GeoJSON
+const geojsonUrl = 'https://raw.githubusercontent.com/ahorrillo/MapasPotencialSolar/refs/heads/main/potencial-solar-caceres/geojson_final/potencial-solar-caceres_completo_opt_min.json';
+
+fetch(geojsonUrl)
+.then(r => r.json())
+.then(data => {
+    const geoLayer = L.geoJSON(data, {
+        style: style,
+        onEachFeature: function(feature, layer) {
+            const potencial = feature.properties.potencial_solar;
+            const direccion = feature.properties.direccion || "Sin dirección";
+            const altura = feature.properties.altura_estimada || 'N/A';
+
+            layer.bindTooltip(
+                `<span class="highlighted">${direccion}</span><br>Potencial: ${potencial}`,
+                { sticky: true }
+            );
+
+            layer.bindPopup(
+                `Dirección: ${direccion}<br>Potencial solar: ${potencial}<br>` +
+                `Altura estimada: ${altura} m`
+            );
+
+            vocMapIndex[normalizeString(direccion)] = layer;
+            layer.on('click', () => highlightLayers([layer]));
+        }
+    }).addTo(map);
+
+    const initialBounds = geoLayer.getBounds();
+
+    // Botón reset
+    const resetButton = L.control({ position: 'bottomright' });
+    resetButton.onAdd = function () {
+        const div = L.DomUtil.create('div', 'leaflet-bar');
+        div.innerHTML = `<a href="#" style="
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            width:34px;
+            height:34px;
+            background:#fff;">⤢</a>`;
+        div.onclick = function(e) {
+            e.preventDefault();
+            clearHighlight();
+            map.fitBounds(initialBounds, { maxZoom: 17 });
+        };
+        return div;
+    };
+    resetButton.addTo(map);
+
+    // Leyenda
+    const legend = L.control({ position: 'bottomleft' });
+    legend.onAdd = function() {
+        const div = L.DomUtil.create('div');
+        div.style.background = 'white';
+        div.style.padding = '8px';
+        div.style.border = '1px solid #999';
+        div.style.borderRadius = '4px';
+        div.style.fontSize = '12px';
+
+        let html = '<b>Potencial solar</b><br>';
+        rangosColores.forEach(r => {
+            html += `<div style="display:flex;align-items:center;margin-top:2px;">
+                        <span style="
+                            background:${r.color};
+                            width:14px;
+                            height:14px;
+                            display:inline-block;
+                            margin-right:6px;
+                            border:1px solid #ccc;">
+                        </span>
+                        ${r.min} – ${r.max}
+                     </div>`;
+        });
+
+        div.innerHTML = html;
+        return div;
+    };
+    legend.addTo(map);
+
+    // Buscador
+    document.getElementById('voc-map-search-input').addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            const query = normalizeString(this.value.trim());
+            const matches = Object.keys(vocMapIndex).filter(d => d.includes(query));
+
+            if (matches.length > 0) {
+                const layers = matches.map(d => vocMapIndex[d]);
+                highlightLayers(layers);
+                map.fitBounds(layers[0].getBounds(), { maxZoom: 18 });
+                layers[0].openPopup();
+            } else {
+                alert('No se encontró ningún resultado con ese nombre.');
+            }
+        }
+    });
+
+})
+.catch(err => console.error('Error cargando GeoJSON:', err));
+</script>
+
+</body>
+</html>

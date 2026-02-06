@@ -227,7 +227,7 @@ Ejemplo:
 Desarrollado por **Antonio Horrillo Horrillo**.
 <ahorrillo@hoy.es> | <tuanhorrillo@gmail.com> | [GitHub](https://github.com/ahorrillo) | [LinkedIn](https://www.linkedin.com/in/antoniohh)
 
-Proyecto creado y mantenido por Antonio Horrillo Horrillo, responsable de Analista, SEO Técnico y Desarrollo.
+Proyecto creado y mantenido por Antonio Horrillo Horrillo, responsable Analista, SEO Técnico y Desarrollo.
 
 ---
 
