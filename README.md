@@ -45,7 +45,9 @@ Actualmente se ha usado con:
 ├── scripts/
 │   ├── dividir_geojson.py                            # Divide un GeoJSON grande en partes pequeñas
 │   ├── unir_geojson.py                               # Une múltiples GeoJSON procesados en uno solo
-│   ├── potencial-solar-badajoz-best.py               # Obtiene direcciones a partir de GeoJSON
+│   ├── potencial-solar.py                            # Obtiene direcciones a partir de GeoJSON
+│   ├── limpiar_direcciones.py                        # Dejamos las direcciones limpias con solo la calle y el número.
+│   ├── jq.exe                                        # Minificamos el GeoJSON en Json.
 │   └── ...
 ├── LICENSE
 └── README.md
@@ -223,9 +225,9 @@ Ejemplo:
 ## 👤 Autor
 
 Desarrollado por **Antonio Horrillo Horrillo**.
-<ahorrillo@hoy.es> | <tuanhorrillo@gmail.com> [GitHub](https://github.com/ahorrillo) | [LinkedIn](https://www.linkedin.com/in/antoniohh)
+<ahorrillo@hoy.es> | <tuanhorrillo@gmail.com> | [GitHub](https://github.com/ahorrillo) | [LinkedIn](https://www.linkedin.com/in/antoniohh)
 
-Proyecto creado y mantenido por Antonio Horrillo Horrillo, responsable de la arquitectura, desarrollo y diseño de Mapas.
+Proyecto creado y mantenido por Antonio Horrillo Horrillo, responsable de Analista, SEO Técnico y Desarrollo.
 
 ---
 
