@@ -130,8 +130,8 @@ def main():
     print("=" * 60)
 
     # Configurar archivos (puedes cambiar estos valores)
-    archivo_entrada = "potencial-solar-badajoz_completo.geojson"  # Cambia esto por tu archivo
-    archivo_salida = "potencial-solar-badajoz_completo_opt.geojson"  # Archivo de salida
+    archivo_entrada = "potencial-solar-caceres_completo.geojson"  # Cambia esto por tu archivo
+    archivo_salida = "potencial-solar-caceres_completo_opt.geojson"  # Archivo de salida
 
     # Preguntar si se quieren usar nombres diferentes
     respuesta = input(f"\n¿Procesar '{archivo_entrada}'? (s/n): ").strip().lower()

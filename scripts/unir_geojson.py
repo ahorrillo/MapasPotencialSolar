@@ -69,10 +69,8 @@ def unir_geojson(directorio=os.getcwd(), archivo_salida="geojson_completo.geojso
 def main_unir():
     """Función principal para unir GeoJSON"""
     directorio = input(f"Ingrese el directorio con los archivos GeoJSON (presione Enter para usar '{os.getcwd()}'): ").strip()
-    
     if not os.path.isdir(directorio):
-        print("El directorio especificado no existe")
-        return
+        directorio=os.getcwd()
     
     nombre_salida = input("Ingrese el nombre del archivo de salida (presione Enter para usar 'geojson_completo.geojson'): ").strip()
     if not nombre_salida:
